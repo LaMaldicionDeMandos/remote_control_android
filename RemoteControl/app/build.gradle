@@ -8,7 +8,7 @@ android {
         exclude 'META-INF/NOTICE.txt'
     }
     defaultConfig {
-        applicationId "remote_control.android.pasut.org.remotecontrol"
+        applicationId "org.pasut.android.remotecontrol"
         minSdkVersion 15
         targetSdkVersion 22
         versionCode 1

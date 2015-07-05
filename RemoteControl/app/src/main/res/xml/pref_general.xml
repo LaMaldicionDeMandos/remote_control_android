@@ -16,11 +16,11 @@
     <EditTextPreference
         android:key="settings_port"
         android:title="@string/pref_port_title"
-        android:defaultValue="@string/pref_default_port"
+        android:defaultValue="@integer/pref_default_port"
         android:summary="@string/pref_port_summary"
         android:selectAllOnFocus="true"
-        android:inputType="text|number"
-        android:capitalize="words"
+        android:numeric="integer"
+        android:inputType="number"
         android:singleLine="true"
         android:maxLines="1" />
 

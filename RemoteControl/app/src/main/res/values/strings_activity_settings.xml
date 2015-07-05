@@ -8,7 +8,7 @@
     <string name="pref_ip_summary">Use the ip provide by the gadget</string>
 
     <string name="pref_port_title">Port</string>
-    <string name="pref_default_port">80</string>
+    <integer name="pref_default_port">80</integer>
     <string name="pref_port_summary">Use the port provide by the gadget</string>
 
 </resources>
