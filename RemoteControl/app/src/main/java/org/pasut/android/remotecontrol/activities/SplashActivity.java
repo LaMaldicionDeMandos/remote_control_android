@@ -38,8 +38,8 @@ public class SplashActivity extends RoboActivity {
             startActivityForResult(new Intent(this, SettingsActivity.class), RESPONSE);
             preferences.put(FRE, true);
         } else {
-//            startActivity(new Intent(this, MainActivity.class));
-//            finish();
+            startActivity(new Intent(this, MainActivity.class));
+            finish();
         }
     }
 

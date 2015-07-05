@@ -19,8 +19,8 @@ public class RestService {
     @Inject
     public RestService(final SpiceManager spice, final SharedPreferences preferences) {
         this.spice = spice;
-        this.host = preferences.getString("settings_ip", "jojo");
-        this.port = preferences.getInt("settings_port", 1);
+        this.host = preferences.getString("settings_ip", "localhost");
+        this.port = Integer.valueOf(preferences.getString("settings_port", "80"));
     }
 
     public void start(final Context context) {
