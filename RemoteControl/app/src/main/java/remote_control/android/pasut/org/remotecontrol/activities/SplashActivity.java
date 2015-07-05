@@ -9,6 +9,7 @@ import com.google.inject.Inject;
 
 import remote_control.android.pasut.org.remotecontrol.R;
 import remote_control.android.pasut.org.remotecontrol.services.PreferencesService;
+import remote_control.android.pasut.org.remotecontrol.services.RestService;
 import roboguice.activity.RoboActivity;
 import roboguice.inject.ContentView;
 
@@ -16,6 +17,9 @@ import roboguice.inject.ContentView;
 public class SplashActivity extends RoboActivity {
     private final static String FRE = "FIRST_RUNNING_EXPERIENCE";
     private final static int RESPONSE = 1;
+
+    @Inject
+    private RestService restService;
 
     @Inject
     private PreferencesService preferences;
@@ -33,8 +37,8 @@ public class SplashActivity extends RoboActivity {
             startActivityForResult(new Intent(this, SettingsActivity.class), RESPONSE);
             preferences.put(FRE, true);
         } else {
-            startActivity(new Intent(this, MainActivity.class));
-            finish();
+//            startActivity(new Intent(this, MainActivity.class));
+//            finish();
         }
     }
 
@@ -42,5 +46,17 @@ public class SplashActivity extends RoboActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         startActivity(new Intent(this, MainActivity.class));
         finish();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        restService.start(this);
+    }
+
+    @Override
+    protected void onStop() {
+        restService.shouldStop();
+        super.onStop();
     }
 }
