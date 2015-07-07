@@ -7,16 +7,16 @@ import com.octo.android.robospice.request.googlehttpclient.GoogleHttpClientSpice
 /**
  * Created by marcelo on 05/07/15.
  */
-public class PingRequest extends GoogleHttpClientSpiceRequest<Void> {
+public class PingRequest extends AbstractRequest<Void> {
 
-    public PingRequest() {
-        super(Void.class);
+    public PingRequest(final String host, final int port) {
+        super(host, port, Void.class);
     }
 
     @Override
     public Void loadDataFromNetwork() throws Exception {
         HttpRequest request = getHttpRequestFactory()
-                .buildGetRequest(new GenericUrl("http://localhost:8080/ping"));
+                .buildGetRequest(new GenericUrl(url + "ping"));
         request.execute();
         return null;
     }

@@ -1,12 +1,16 @@
 <resources>
     <string name="app_name">RemoteControl</string>
 
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="action_loading">Loading...</string>
 
     <string name="title_activity_splash">SplashActivity</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
+
+    <string name="fail_server_message">Ops, it seems that the server is down</string>
+    <string name="fail_server_dialog_title">Server connection</string>
+    <string name="fail_server_dialog_message">Exit?</string>
+
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 
 </resources>
