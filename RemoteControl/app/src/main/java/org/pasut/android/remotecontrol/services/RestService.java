@@ -6,10 +6,14 @@ import android.content.SharedPreferences;
 import com.google.inject.Inject;
 import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.DurationInMillis;
+import com.octo.android.robospice.request.googlehttpclient.GoogleHttpClientSpiceRequest;
 import com.octo.android.robospice.request.listener.RequestListener;
 
+import org.pasut.android.remotecontrol.services.rest.LedsRequest;
 import org.pasut.android.remotecontrol.services.rest.PingRequest;
 
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.concurrent.Future;
 
 import roboguice.inject.InjectPreference;
@@ -30,7 +34,15 @@ public class RestService {
     }
 
     public void ping(RequestListener<Void> listener) {
-        spice.execute(new PingRequest(getHost(), getPort()), "json", ONE_MINUTE, listener);
+        executeRequest(new PingRequest(getHost(), getPort()), listener);
+    }
+
+    public void leds(RequestListener<List<BigDecimal>> listener) {
+        executeRequest(new LedsRequest(getHost(), getPort()), listener);
+    }
+
+    private <T> void executeRequest(GoogleHttpClientSpiceRequest<T> request, RequestListener<T> listener) {
+        spice.execute(request, "json", ONE_MINUTE, listener);
     }
 
     private String getHost() {
