@@ -2,24 +2,6 @@
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent" android:background="@color/black_overlay"
     tools:context="remote_control.android.pasut.org.remotecontrol.activities.SplashActivity">
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_gravity="center">
-        <ImageView android:id="@+id/loading"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:background="@drawable/loading_animation"/>
-        <TextView
-            android:text="@string/action_loading"
-            android:paddingTop="@dimen/commond_gap"
-            android:textAppearance="@android:style/TextAppearance.Large"
-            android:textColor="@android:color/white"
-            android:layout_gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
 
-    </LinearLayout>
+    <include layout="@layout/view_loading" />
 </FrameLayout>

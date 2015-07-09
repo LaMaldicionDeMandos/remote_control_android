@@ -8,6 +8,7 @@ import org.pasut.android.remotecontrol.services.DefaultPreferencesService;
 import org.pasut.android.remotecontrol.services.PreferencesService;
 import org.pasut.android.remotecontrol.services.RestService;
 import org.pasut.android.remotecontrol.services.rest.RestSpiceService;
+import org.pasut.android.remotecontrol.services.rest.RoboSpiceProvider;
 
 import roboguice.inject.SharedPreferencesName;
 
@@ -18,7 +19,7 @@ public class RemoteControlModule implements Module {
     @Override
     public void configure(Binder binder) {
         binder.bind(PreferencesService.class).to(DefaultPreferencesService.class);
-        binder.bind(SpiceManager.class).toInstance(new SpiceManager(RestSpiceService.class));
+        binder.bind(SpiceManager.class).toProvider(RoboSpiceProvider.class);
         binder.bind(RestService.class);
     }
 }

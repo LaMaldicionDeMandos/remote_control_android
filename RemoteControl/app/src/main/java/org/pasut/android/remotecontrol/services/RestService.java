@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.concurrent.Future;
 
+import roboguice.inject.ContextSingleton;
 import roboguice.inject.InjectPreference;
 
 import static com.octo.android.robospice.persistence.DurationInMillis.ONE_MINUTE;
@@ -23,6 +24,7 @@ import static com.octo.android.robospice.persistence.DurationInMillis.ONE_MINUTE
 /**
  * Created by marcelo on 05/07/15.
  */
+@ContextSingleton
 public class RestService {
     private final SpiceManager spice;
     private final SharedPreferences preferences;
