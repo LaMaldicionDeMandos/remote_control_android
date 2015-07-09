@@ -51,14 +51,14 @@ public class SplashActivity extends RoboActivity {
             startActivityForResult(new Intent(this, SettingsActivity.class), RESPONSE);
             preferences.put(FRE, true);
         } else {
-            restService.ping(firstPingListener);
+            restService.ping(pingListener);
         }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == RESPONSE) {
-            restService.ping(secondPingListener);
+            restService.ping(pingListener);
         } else {
             Toast.makeText(SplashActivity.this, fail_server_message, LENGTH_LONG).show();
             new AlertDialog.Builder(this)
@@ -92,19 +92,11 @@ public class SplashActivity extends RoboActivity {
         super.onStop();
     }
 
-    private final RequestListener<Void> firstPingListener = new PingListener(RESPONSE);
-    private final RequestListener<Void> secondPingListener = new PingListener(FAILURE_RESPONSE);
-
-    private class PingListener implements RequestListener<Void> {
-        private final int response;
-
-        public PingListener(final int response) {
-            this.response = response;
-        }
+    private final RequestListener<Void> pingListener = new RequestListener<Void>() {
         @Override
         public void onRequestFailure(SpiceException spiceException) {
             Toast.makeText(SplashActivity.this, fail_server_message, LENGTH_LONG).show();
-            startActivityForResult(new Intent(SplashActivity.this, SettingsActivity.class), response);
+            startActivityForResult(new Intent(SplashActivity.this, SettingsActivity.class), FAILURE_RESPONSE);
         }
 
         @Override
@@ -112,5 +104,5 @@ public class SplashActivity extends RoboActivity {
             startActivity(new Intent(SplashActivity.this, MainActivity.class));
             finish();
         }
-    }
+    };
 }
