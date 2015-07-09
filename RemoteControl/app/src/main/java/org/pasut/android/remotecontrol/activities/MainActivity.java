@@ -36,6 +36,7 @@ import roboguice.inject.ContentView;
 
 import static org.pasut.android.remotecontrol.R.drawable.light_off;
 import static org.pasut.android.remotecontrol.R.drawable.light_on;
+import static org.pasut.android.remotecontrol.utils.ActivityUtils.configurarionErrorMessage;
 
 
 @ContentView(R.layout.activity_main)
@@ -56,7 +57,7 @@ public class MainActivity extends RoboActivity {
         restService.leds(new RequestListener<List<BigDecimal>>() {
             @Override
             public void onRequestFailure(SpiceException spiceException) {
-                ActivityUtils.configurarionErrorMessage(MainActivity.this, RESULT_OK);
+                configurarionErrorMessage(MainActivity.this, RESULT_OK);
             }
 
             @Override
@@ -77,13 +78,13 @@ public class MainActivity extends RoboActivity {
     }
 
     private void populate(final ListView ledsView, final List<BigDecimal> intLeds) {
-        List<Led> leds = Lists.transform(intLeds, new Function<BigDecimal, Led>() {
+        List<Led> leds = Lists.newArrayList(Lists.transform(intLeds, new Function<BigDecimal, Led>() {
             @Override
             public Led apply(@Nullable BigDecimal input) {
                 Led led = new Led(input.intValue());
                 return led;
             }
-        });
+        }));
         ledsView.setAdapter(new LedListAdapter(leds));
     }
 
@@ -153,11 +154,27 @@ public class MainActivity extends RoboActivity {
             final Led led = (Led) getItem(position);
             holder.name.setText(String.valueOf(led.getId()));
             holder.state.setChecked(led.isState());
-            holder.state.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            holder.state.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                public void onClick(View v) {
+                    final boolean isChecked = holder.state.isChecked();
                     Log.d("CHANGE STATE", "TO: " + isChecked);
-                    led.setState(isChecked);
+                    restService.changeStatus(led, isChecked, new RequestListener<Boolean>() {
+                        @Override
+                        public void onRequestFailure(SpiceException spiceException) {
+                            holder.state.setChecked(led.isState());
+                        }
+
+                        @Override
+                        public void onRequestSuccess(Boolean state) {
+                            if (state) {
+                                led.setState(isChecked);
+                                notifyDataSetChanged();
+                            } else {
+                                holder.state.setChecked(led.isState());
+                            }
+                        }
+                    });
                 }
             });
             int imageResource = led.isState() ? light_on : light_off;

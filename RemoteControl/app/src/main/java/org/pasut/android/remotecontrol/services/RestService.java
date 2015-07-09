@@ -3,12 +3,16 @@ package org.pasut.android.remotecontrol.services;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.google.api.client.http.HttpRequest;
 import com.google.inject.Inject;
 import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.DurationInMillis;
+import com.octo.android.robospice.request.SpiceRequest;
 import com.octo.android.robospice.request.googlehttpclient.GoogleHttpClientSpiceRequest;
 import com.octo.android.robospice.request.listener.RequestListener;
 
+import org.pasut.android.remotecontrol.model.Led;
+import org.pasut.android.remotecontrol.services.rest.ChangeStateRequest;
 import org.pasut.android.remotecontrol.services.rest.LedsRequest;
 import org.pasut.android.remotecontrol.services.rest.PingRequest;
 
@@ -43,7 +47,12 @@ public class RestService {
         executeRequest(new LedsRequest(getHost(), getPort()), listener);
     }
 
-    private <T> void executeRequest(GoogleHttpClientSpiceRequest<T> request, RequestListener<T> listener) {
+    public void changeStatus(final Led led, final boolean state, RequestListener<Boolean> listener) {
+        SpiceRequest<Boolean> request = new ChangeStateRequest(getHost(), getPort(), led, state);
+        executeRequest(request, listener);
+    }
+
+    private <T> void executeRequest(SpiceRequest<T> request, RequestListener<T> listener) {
         spice.execute(request, "json", ONE_MINUTE, listener);
     }
 
