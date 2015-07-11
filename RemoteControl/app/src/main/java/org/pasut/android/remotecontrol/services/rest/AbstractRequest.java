@@ -12,4 +12,6 @@ public abstract class AbstractRequest<T> extends GoogleHttpClientSpiceRequest<T>
         super(clazz);
         this.url = "http://" + host + ":" + port + "/";
     }
+
+    public abstract String cacheKey();
 }

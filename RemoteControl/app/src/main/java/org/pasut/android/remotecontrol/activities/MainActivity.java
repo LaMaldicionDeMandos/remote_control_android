@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.octo.android.robospice.persistence.exception.SpiceException;
@@ -34,6 +35,7 @@ import javax.annotation.Nullable;
 import roboguice.activity.RoboActivity;
 import roboguice.inject.ContentView;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static org.pasut.android.remotecontrol.R.drawable.light_off;
 import static org.pasut.android.remotecontrol.R.drawable.light_on;
 import static org.pasut.android.remotecontrol.utils.ActivityUtils.configurarionErrorMessage;
@@ -41,7 +43,8 @@ import static org.pasut.android.remotecontrol.utils.ActivityUtils.configurarionE
 
 @ContentView(R.layout.activity_main)
 public class MainActivity extends RoboActivity {
-
+    private final static String TAG = MainActivity.class.getSimpleName();
+    private LedListAdapter adapter;
     @Inject
     private RestService restService;
 
@@ -62,10 +65,10 @@ public class MainActivity extends RoboActivity {
 
             @Override
             public void onRequestSuccess(List<BigDecimal> leds) {
-                Log.d("RESPONSE", leds.toString());
-                ListView ledsView = (ListView) findViewById(R.id.leds);
-                populate(ledsView, leds);
-                ViewSwitcher switcher = (ViewSwitcher)findViewById(R.id.switcher);
+                Log.d(TAG, "RESPONSE" + leds.toString());
+                findLedStates(leds);
+                adapter = populate();
+                ViewSwitcher switcher = (ViewSwitcher) findViewById(R.id.switcher);
                 switcher.showNext();
             }
         });
@@ -77,15 +80,38 @@ public class MainActivity extends RoboActivity {
         super.onStop();
     }
 
-    private void populate(final ListView ledsView, final List<BigDecimal> intLeds) {
-        List<Led> leds = Lists.newArrayList(Lists.transform(intLeds, new Function<BigDecimal, Led>() {
+    private void findLedStates(List<BigDecimal> ledIds) {
+        List<Led> leds = Lists.transform(ledIds, new Function<BigDecimal, Led>() {
             @Override
             public Led apply(@Nullable BigDecimal input) {
                 Led led = new Led(input.intValue());
                 return led;
             }
-        }));
-        ledsView.setAdapter(new LedListAdapter(leds));
+        });
+        for (final Led led : leds) {
+            Log.d(TAG, "Finding Led State: " + led.getId());
+            restService.ledState(led, new RequestListener<Boolean>() {
+                @Override
+                public void onRequestFailure(SpiceException spiceException) {
+                    configurarionErrorMessage(MainActivity.this, RESULT_OK);
+                }
+
+                @Override
+                public void onRequestSuccess(Boolean state) {
+                    Log.d(TAG, "Found Led State: " + led.getId() + " " + state);
+                    led.setState(state);
+                    adapter.addLed(led);
+                }
+            });
+        }
+    }
+
+    private LedListAdapter populate() {
+        ListView ledsView = (ListView) findViewById(R.id.leds);
+        List<Led> list = newArrayList();
+        LedListAdapter adapter = new LedListAdapter(list);
+        ledsView.setAdapter(adapter);
+        return adapter;
     }
 
     @Override
@@ -123,6 +149,11 @@ public class MainActivity extends RoboActivity {
             super();
             this.leds = leds;
         }
+
+        public void addLed(Led led) {
+            leds.add(led);
+            notifyDataSetChanged();
+        }
         @Override
         public int getCount() {
             return leds.size();
@@ -158,21 +189,19 @@ public class MainActivity extends RoboActivity {
                 @Override
                 public void onClick(View v) {
                     final boolean isChecked = holder.state.isChecked();
-                    Log.d("CHANGE STATE", "TO: " + isChecked);
+                    Log.d(TAG,"CHANGE STATE TO: " + isChecked);
                     restService.changeStatus(led, isChecked, new RequestListener<Boolean>() {
                         @Override
                         public void onRequestFailure(SpiceException spiceException) {
+                            Log.d(TAG, "Faile to change led " + led.getId() + " to state " + isChecked);
                             holder.state.setChecked(led.isState());
                         }
 
                         @Override
                         public void onRequestSuccess(Boolean state) {
-                            if (state) {
-                                led.setState(isChecked);
-                                notifyDataSetChanged();
-                            } else {
-                                holder.state.setChecked(led.isState());
-                            }
+                            Log.d(TAG, "change led " + led.getId() + " to state " + isChecked);
+                            led.setState(isChecked);
+                            notifyDataSetChanged();
                         }
                     });
                 }

@@ -21,17 +21,25 @@ public class LedsRequest extends AbstractRequest<List<BigDecimal>> {
         return (Class<List<BigDecimal>>)list.getClass();
     }
 
+    private final String path;
+
     public LedsRequest(String host, int port) {
         super(host, port, getClazz());
+        path = url + "leds";
     }
 
     @Override
     public List<BigDecimal> loadDataFromNetwork() throws Exception {
         HttpRequest request = getHttpRequestFactory()
-                .buildGetRequest(new GenericUrl(url + "leds"));
+                .buildGetRequest(new GenericUrl(path));
         request.setParser(new GsonFactory().createJsonObjectParser());
         HttpResponse response = request.execute();
         List<BigDecimal> result = response.parseAs(getClazz());
         return result;
+    }
+
+    @Override
+    public String cacheKey() {
+        return path;
     }
 }

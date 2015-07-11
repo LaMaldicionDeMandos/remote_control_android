@@ -20,4 +20,9 @@ public class RestSpiceService extends GoogleHttpClientSpiceService {
 
         return cacheManager;
     }
+
+    @Override
+    public int getThreadCount(){
+        return 6;
+    }
 }
