@@ -10,7 +10,10 @@
     <string name="fail_server_dialog_title">Server connection</string>
     <string name="fail_server_dialog_message">Exit?</string>
 
+    <string name="led_name_dialog_title">Change Led Name</string>
+
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="ok">OK</string>
 
 </resources>

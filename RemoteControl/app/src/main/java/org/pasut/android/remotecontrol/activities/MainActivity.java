@@ -1,15 +1,21 @@
 package org.pasut.android.remotecontrol.activities;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -24,11 +30,13 @@ import com.octo.android.robospice.request.listener.RequestListener;
 
 import org.pasut.android.remotecontrol.R;
 import org.pasut.android.remotecontrol.model.Led;
+import org.pasut.android.remotecontrol.services.PreferencesService;
 import org.pasut.android.remotecontrol.services.RestService;
 import org.pasut.android.remotecontrol.utils.ActivityUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 
 import javax.annotation.Nullable;
 
@@ -38,19 +46,29 @@ import roboguice.inject.ContentView;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.pasut.android.remotecontrol.R.drawable.light_off;
 import static org.pasut.android.remotecontrol.R.drawable.light_on;
+import static org.pasut.android.remotecontrol.R.string.led_name_dialog_title;
+import static org.pasut.android.remotecontrol.R.string.ok;
 import static org.pasut.android.remotecontrol.utils.ActivityUtils.configurarionErrorMessage;
 
 
 @ContentView(R.layout.activity_main)
 public class MainActivity extends RoboActivity {
     private final static String TAG = MainActivity.class.getSimpleName();
+    private final static String LED_PREFIX = "led";
     private LedListAdapter adapter;
     @Inject
     private RestService restService;
 
+    @Inject
+    private PreferencesService preferences;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ImageView loadingImage = (ImageView) findViewById(R.id.loading);
+
+        AnimationDrawable loadingAnimation = (AnimationDrawable) loadingImage.getBackground();
+        loadingAnimation.start();
     }
 
     @Override
@@ -85,6 +103,9 @@ public class MainActivity extends RoboActivity {
             @Override
             public Led apply(@Nullable BigDecimal input) {
                 Led led = new Led(input.intValue());
+                if( preferences.contain(LED_PREFIX + led.getId())) {
+                    led.setName(preferences.get(LED_PREFIX + led.getId(), String.class));
+                }
                 return led;
             }
         });
@@ -109,8 +130,34 @@ public class MainActivity extends RoboActivity {
     private LedListAdapter populate() {
         ListView ledsView = (ListView) findViewById(R.id.leds);
         List<Led> list = newArrayList();
-        LedListAdapter adapter = new LedListAdapter(list);
+        final LedListAdapter adapter = new LedListAdapter(list);
         ledsView.setAdapter(adapter);
+        ledsView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                final Led led = (Led) MainActivity.this.adapter.getItem(position);
+                final EditText input = new EditText(MainActivity.this);
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.MATCH_PARENT);
+                input.setLayoutParams(lp);
+                input.setText(led.getName());
+                Log.d(TAG, "Led selected: " + led.getId());
+                new AlertDialog.Builder(MainActivity.this).setTitle(led_name_dialog_title)
+                        .setNeutralButton(ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            String name = input.getText().toString();
+                            if (name != null && !name.isEmpty()) {
+                                led.setName(name);
+                                preferences.put(LED_PREFIX + led.getId(), name);
+                                adapter.notifyDataSetChanged();
+                            }
+                        }
+                }).setView(input).show();
+                return true;
+            }
+        });
         return adapter;
     }
 
@@ -183,7 +230,7 @@ public class MainActivity extends RoboActivity {
                 holder = (ViewHolder)convertView.getTag();
             }
             final Led led = (Led) getItem(position);
-            holder.name.setText(String.valueOf(led.getId()));
+            holder.name.setText(led.hasName()? led.getName() : String.valueOf(led.getId()));
             holder.state.setChecked(led.isState());
             holder.state.setOnClickListener(new View.OnClickListener() {
                 @Override

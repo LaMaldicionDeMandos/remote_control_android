@@ -43,6 +43,14 @@ public class Led {
         this.state = state;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public boolean hasName() {
+        return name != null && !name.isEmpty();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == this) return true;
