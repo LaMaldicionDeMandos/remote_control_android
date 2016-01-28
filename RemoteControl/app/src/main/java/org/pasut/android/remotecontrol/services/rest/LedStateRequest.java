@@ -18,7 +18,7 @@ public class LedStateRequest extends AbstractRequest<Boolean> {
     public LedStateRequest(final String host, final int port, final int ledId) {
         super(host, port, Boolean.class);
         this.ledId = ledId;
-        this.path = url + "status/" + ledId;
+        this.path = url + "status/" + ledId + "/";
     }
 
     @Override

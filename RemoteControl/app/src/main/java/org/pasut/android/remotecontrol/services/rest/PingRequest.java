@@ -12,7 +12,7 @@ public class PingRequest extends AbstractRequest<Void> {
 
     public PingRequest(final String host, final int port) {
         super(host, port, Void.class);
-        path = url + "ping";
+        path = url + "ping/";
     }
 
     @Override

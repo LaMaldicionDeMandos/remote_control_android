@@ -25,7 +25,7 @@ public class ChangeStateRequest extends AbstractRequest<Boolean> {
         super(host, port, Boolean.class);
         this.led = led;
         this.state = state ? "on" : "off";
-        this.path = url + "led/" + led.getId() + "/" + this.state;
+        this.path = url + "led/" + led.getId() + "/" + this.state + "/";
     }
 
     @Override

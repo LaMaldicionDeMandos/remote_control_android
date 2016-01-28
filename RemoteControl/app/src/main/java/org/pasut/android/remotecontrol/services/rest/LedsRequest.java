@@ -25,7 +25,7 @@ public class LedsRequest extends AbstractRequest<List<BigDecimal>> {
 
     public LedsRequest(String host, int port) {
         super(host, port, getClazz());
-        path = url + "leds";
+        path = url + "leds/";
     }
 
     @Override
